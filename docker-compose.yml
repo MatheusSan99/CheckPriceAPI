@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  abastecefacilapi:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    environment:
+      - DB_CONNECTION=sqlite
+      - DB_DATABASE=/var/www/html/database/database.sqlite
+    container_name: abastecefacilapi
+    volumes:
+      - ./:/var/www/html/
+    ports:
+      - "5050:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
