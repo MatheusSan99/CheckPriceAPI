@@ -1,22 +1,28 @@
 <?php
 
-namespace APP\AbasteceFacilAPI\Controller;
+namespace API\AbasteceFacil\Controller;
 
+use API\AbasteceFacil\Services\ConnectionHandler;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 class PostosController
 {
+    private $pdo;
+    use ConnectionHandler;
+
 
     public function __construct(\PDO $pdo)
     {
+        $this->pdo = $pdo;
     }
 
-
-    public function a()
+    public function index (ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
-        $a = 1;
-
-        $b = 2;
-
-        echo $b;
+        $response = $response->withHeader('Content-Type', 'application/json');
+        $response->getBody()->write(json_encode($this->searchPrices()));
+        return $response;
     }
+
+    
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Ultralims\Integracao\Services;
+namespace API\AbasteceFacil\Services;
 
 use Psr\Http\Message\ResponseInterface;
 use Nyholm\Psr7\Response;

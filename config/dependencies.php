@@ -26,26 +26,19 @@ return function (ContainerBuilder $containerBuilder) {
     $containerBuilder->addDefinitions([
         PDO::class => function (ContainerInterface $c) {
             $dbSettings = $c->get('settings')['db'];
-
+    
             $driver = $dbSettings['driver'];
-            $host = $dbSettings['host'];
-            $dbname = $dbSettings['database'];
-            $username = $dbSettings['username'];
-            $password = $dbSettings['password'];
-            $charset = $dbSettings['charset'];
-            $flags = $dbSettings['flags'];
-            $dsn = $driver . ":host=$host;dbname=$dbname;charset=$charset";
-
+            $dsn = 'sqlite:' . $dbSettings['database']; // Caminho para o arquivo SQLite
+            
             try {
-                $pdo = new PDO($dsn, $username, $password);
-                foreach ($flags as $attribute => $value) {
-                    $pdo->setAttribute($attribute, $value);
-                }
+                $pdo = new PDO($dsn);
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             } catch (PDOException $e) {
                 echo "Error in DB conn: " . $e->getMessage();
             }
-
+    
             return $pdo;
         }
     ]);
+    
 };
