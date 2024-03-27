@@ -4,4 +4,4 @@ chmod -f 777 "./logs/php-error.log"
 
 docker compose build
 docker compose up -d
-docker exec abastecefacilapi composer install
+docker exec checkprice composer install

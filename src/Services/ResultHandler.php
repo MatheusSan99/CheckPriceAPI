@@ -1,6 +1,6 @@
 <?php
 
-namespace API\AbasteceFacil\Services;
+namespace API\CheckPrice\Services;
 
 use Psr\Http\Message\ResponseInterface;
 use Nyholm\Psr7\Response;

@@ -1,8 +1,8 @@
 <?php
 
-namespace API\AbasteceFacil\Controller;
+namespace API\CheckPrice\Controller;
 
-use API\AbasteceFacil\Services\ConnectionHandler;
+use API\CheckPrice\Services\ConnectionHandler;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 

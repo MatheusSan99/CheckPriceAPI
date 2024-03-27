@@ -1,6 +1,6 @@
 <?php
 
-use API\AbasteceFacil\Controller\{
+use API\CheckPrice\Controller\{
     PostosController,
 };
 use Psr\Http\Message\ResponseInterface;
