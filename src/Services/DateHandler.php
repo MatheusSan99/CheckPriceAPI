@@ -12,39 +12,40 @@ class DateHandler
     private $numericMonth;
     private $year;
 
-    public function __construct($month = null, $year = null)
+    public function __construct(int $month = null, int $year = null)
     {
         $this->DateTime = new DateTime('now', new DateTimeZone('America/Sao_Paulo'));
 
-        if (empty($month)) {
+        if (!is_numeric($month)) {
             $this->numericMonth = $this->DateTime->format('m');
             $this->year = $this->DateTime->format('Y');
-            $this->month = $this->mapMonth($this->numericMonth);
+            $this->mapMonth($this->numericMonth);
         }
 
-        if (!empty($month) && !empty($year)) {
+        if (is_numeric($month) && is_numeric($year)) {
             $this->numericMonth = $month;
             $this->year = $year;
-            $this->month = $this->mapMonth($month);
+            $this->mapMonth($month);
         }
     }
 
     private function mapMonth($month) {
         $months = [
-            '01' => 'janeiro',
-            '02' => 'fevereiro',
-            '03' => 'marco',
-            '04' => 'abril',
-            '05' => 'maio',
-            '06' => 'junho',
-            '07' => 'julho',
-            '08' => 'agosto',
-            '09' => 'setembro',
+            '1' => 'janeiro',
+            '2' => 'fevereiro',
+            '3' => 'marco',
+            '4' => 'abril',
+            '5' => 'maio',
+            '6' => 'junho',
+            '7' => 'julho',
+            '8' => 'agosto',
+            '9' => 'setembro',
             '10' => 'outubro',
             '11' => 'novembro',
             '12' => 'dezembro'
         ];
-        return $months[$month];
+
+        $this->month = $months[$month];
     }
 
     public function setPreviousMonth() {

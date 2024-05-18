@@ -3,25 +3,43 @@
 namespace API\CheckPrice\Controller;
 
 use API\CheckPrice\Services\ConnectionHandler;
+use API\CheckPrice\Services\ParamsValidation\ParamsValidation;
+use API\CheckPrice\Services\PdfHandler;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\ResponseInterface;
+use Slim\Psr7\Response;
 
 class PostosController
 {
     private $pdo;
     use ConnectionHandler;
+    use ParamsValidation;
+    use PdfHandler;
 
-
-    public function __construct(\PDO $pdo)
+    public function checkActualPrice(ServerRequestInterface $request, Response $response, array $args): Response
     {
-        $this->pdo = $pdo;
+        $params = $request->getQueryParams();
+
+        $this->validateMonth($params['month']);
+        $this->validateYear($params['year']);
+        
+        $pricesUrl = $this->searchPrices('combustiveis', $params['month'], $params['year']);
+
+        if (empty($pricesUrl)) {
+            throw new \Exception('Tipo de pesquisa não encontrado', 404);
+        }
+
+        $pdf = $this->pdfReader($pricesUrl);
+
+        $response->getBody()->write(json_encode($pdf));
+
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
-    public function index (ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
+    private function pdfReader($pricesUrl) 
     {
-        $response = $response->withHeader('Content-Type', 'application/json');
-        $response->getBody()->write(json_encode($this->searchPrices()));
-        return $response;
+        $pdf = $this->searchDataPDF($pricesUrl);
+
+        return $pdf;
     }
 
     

@@ -19,7 +19,7 @@ return function (App $app) {
         return $response;
     });
 
-    $app->get('/postos', PostosController::class . ':index')->setName('');
+    $app->get('/postos', PostosController::class . ':checkActualPrice')->setName('');
 
     $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function () use ($app) {
         $responseFactory = new ResponseFactory();
