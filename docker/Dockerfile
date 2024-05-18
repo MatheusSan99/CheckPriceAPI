@@ -10,8 +10,8 @@ ADD docker/centos.conf/xdebug.ini "$PHP_INI_DIR/conf.d/xdebug.ini"
 
 RUN pecl install xdebug
 
-ADD docker/php.ini-development "$PHP_INI_DIR/php.ini"
-ADD docker/apache2.conf "$APACHE_CONFDIR/conf-enabled/apache2.conf"
+ADD ./php.ini-development "$PHP_INI_DIR/php.ini"
+ADD ./apache2.conf "$APACHE_CONFDIR/conf-enabled/apache2.conf"
 
 COPY --from=composer /usr/bin/composer /usr/local/bin/composer
 
