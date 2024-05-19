@@ -2,7 +2,9 @@
 
 namespace API\CheckPrice\Domain\Entity\Gas;
 
-class PremiumGasEntity implements Gas
+use JsonSerializable;
+
+class PremiumGasEntity implements Gas, JsonSerializable
 {
     use PriceValidator;
     use JsonSerializeGas;

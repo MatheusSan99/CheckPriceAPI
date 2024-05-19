@@ -93,7 +93,7 @@ class GasStationEntity implements \JsonSerializable
     {
         return [
             'id' => $this->getId(),
-            'name' => $this->getName(),
+            'name' => trim($this->getName()),
             'address' => $this->getAddress(),
             'flag' => $this->getFlag(),
             'regularGas' => $this->getRegularGas(),

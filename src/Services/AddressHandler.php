@@ -2,6 +2,7 @@
 
 namespace API\CheckPrice\Services;
 
+use API\CheckPrice\Services\Connection\CurlConnection;
 use Exception;
 
 trait AddressHandler
@@ -67,10 +68,11 @@ trait AddressHandler
             'Zona Industrial Tupy'
         ];
 
-        if (preg_grep("/{$completeAddress}/i", $neighborhoods)) {
-            return $completeAddress;
+        foreach ($neighborhoods as $neighborhood) {
+            if (stripos($completeAddress, $neighborhood) !== false) {
+                return $neighborhood;
+            }
         }
-
         return 'Bairro Não Informado';
     }
 
@@ -83,6 +85,45 @@ trait AddressHandler
         $number = substr($number, 0, strpos($number, ','));
         $number = str_replace('s/n', 'Numero Não Encontrado', $number);
         return $number;
+    }
+
+    public function getCepFromAddress($state, $city, $street) {
+        $CurlConnection = new CurlConnection();
+        
+        if (empty($state) || empty($city) || empty($street)) {
+            return 'CEP não encontrado';
+        }
+
+        $street = $this->formatStreetForRequisition($street);
+        
+        $url = "https://viacep.com.br/ws/{$state}/{$city}/{$street}/json/";
+
+        $response = $CurlConnection->getResponse($url);
+
+        if (isset($response['erro'])) {
+            return 'CEP não encontrado';
+        }
+
+        return $response['cep'];
+    }
+
+    private function formatStreetForRequisition($street) 
+    {
+        $street = strtoupper($street);
+        $street = str_replace('R.', '', $street);
+        $street = str_replace('DR.', 'Doutor', $street);
+        $street = str_replace('AV.', '', $street);
+        $street = str_replace('ROD.', '', $street);
+        $street = str_replace('BR.', '', $street);
+        $street = str_replace('EST.', '', $street);
+        $street = str_replace('AL.', '', $street);
+        $street = str_replace('TR.', '', $street);
+        $street = str_replace('V.', '', $street);
+        $street = str_replace('PÇA.', '', $street);
+
+        $street = str_replace(' ', '+', $street);
+
+        return $street;
     }
 
 }

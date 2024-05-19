@@ -56,8 +56,8 @@ class AdressEntity implements JsonSerializable
     public function jsonSerialize() : array
     {
         return [
-            'street' => $this->getStreet(),
-            'number' => $this->getNumber(),
+            'street' => trim($this->getStreet()),
+            'number' => trim($this->getNumber()),
             'neighborhood' => $this->getNeighborhood(),
             'city' => $this->getCity(),
             'state' => $this->getState(),

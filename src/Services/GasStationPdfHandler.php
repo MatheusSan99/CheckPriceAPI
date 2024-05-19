@@ -10,6 +10,7 @@ use API\CheckPrice\Domain\Entity\Gas\PremiumGasEntity;
 use API\CheckPrice\Domain\Entity\Gas\RegularGasEntity;
 use API\CheckPrice\Domain\Entity\GasStation\FlagEntity;
 use API\CheckPrice\Domain\Entity\GasStation\GasStationEntity;
+use API\CheckPrice\Domain\Entity\GasStation\UseCase\FlagCase;
 use Smalot\PdfParser\Document;
 
 trait GasStationPdfHandler
@@ -43,13 +44,12 @@ trait GasStationPdfHandler
 
             $gasStation[] = $value;
         }
-
-
         return $mappedGasStation;
     }
 
     private function mapGasStationData($gasStation)
     {
+        $FlagCase = new FlagCase();
         $id = $gasStation[0] ?? null;
         $name = $gasStation[1] ?? null;
         $address = $this->getAdressData($gasStation[2]) ?? null;
@@ -59,14 +59,14 @@ trait GasStationPdfHandler
             return null;
         }
 
-        $flag = $this->getFlag($flagData);
+        $flag = $FlagCase->validationForValidFlag($flagData);
 
         $gasData = $this->removeFlagFromGasData($flag, $gasStation[3]);
 
         return new GasStationEntity(
             $id,
             $name,
-            new AdressEntity($address['street'], $address['number'], $address['neighborhood'], $address['city'], $address['state']),
+            new AdressEntity($address['street'], $address['number'], $address['neighborhood'], $address['city'], $address['state'], $address['zipCode']),
             new FlagEntity($flag),
             new RegularGasEntity($this->getGasPrice($gasData, 0)),
             new PremiumGasEntity($this->getGasPrice($gasData, 1)),
@@ -76,23 +76,17 @@ trait GasStationPdfHandler
         );
     }
 
-    private function getFlag($flagData)
-    {
-        if (strpos($flagData, ' ') === false) {
-            return $flagData;
-        }
-
-        return substr($flagData, 0, strpos($flagData, ' ', strpos($flagData, ' ') + 1));
-    }
-
     function getAdressData($address) 
     {
+        $street = $this->getStreetFromString($address);
+        
         return [
-            'street' => $this->getStreetFromString($address),
+            'street' => $street,
             'neighborhood' => $this->getNeighborhoodFromString($address),
             'number' => $this->getNumberFromString($address),
             'city' => 'Joinville',
             'state' => 'SC',
+            'zipCode' => ''
         ];
     }
 
@@ -106,7 +100,7 @@ trait GasStationPdfHandler
     private function getGasPrice($gasData, $index)
     {
         if (!isset($gasData[$index])) {
-            return 0;
+            return '0.00';
         }
         
         return $this->parseGasPrice($gasData[$index]);
@@ -114,8 +108,10 @@ trait GasStationPdfHandler
 
     private function parseGasPrice($price)
     {
+        $price = str_replace(',', '.', $price);
+        
         if (!is_numeric($price)) {
-            return 0;
+            return '0.00';
         }
 
         return str_replace(',', '.', $price);

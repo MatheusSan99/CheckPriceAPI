@@ -4,11 +4,13 @@ namespace API\CheckPrice\Domain\Entity\Gas;
 
 trait JsonSerializeGas
 {
-    public function jsonSerialize(Gas $gas): array
+    public function jsonSerialize(): array
     {
+        $price = !empty($this->getPrice()) ? 'R$: ' . $this->getPrice() : 'Preço não informado';
+        
         return [
-            'type' => $gas->getType(),
-            'price' => $gas->getPrice()
+            'type' => $this->getType(),
+            'price' => $price
         ];
     }
 }
