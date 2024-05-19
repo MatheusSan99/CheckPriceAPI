@@ -6,7 +6,7 @@ use Exception;
 
 trait ConnectionHandler
 {
-    use PdfHandler;
+    use GasStationPdfHandler;
     
     public function searchPrices($type, $month, $year) 
     {
