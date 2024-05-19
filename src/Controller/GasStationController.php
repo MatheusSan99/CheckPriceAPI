@@ -10,7 +10,7 @@ use API\CheckPrice\Services\PdfHandler\PdfHandlerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Psr7\Response;
 
-class PostosController implements PdfHandlerInterface
+class GasStationController implements PdfHandlerInterface
 {
     private $pdo;
     use ConnectionHandler;
@@ -41,7 +41,7 @@ class PostosController implements PdfHandlerInterface
         }
     }
 
-    private function pdfReader($pricesUrl) : array
+    public function pdfReader(string $pricesUrl) : array
     {
         $document = $this->searchDataPDF($pricesUrl);
 

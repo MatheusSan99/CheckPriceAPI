@@ -1,7 +1,7 @@
 <?php
 
 use API\CheckPrice\Controller\{
-    PostosController,
+    GasStationController,
 };
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -19,7 +19,7 @@ return function (App $app) {
         return $response;
     });
 
-    $app->get('/postos/{month}/{year}', PostosController::class . ':checkActualPrice')->setName('');
+    $app->get('/v1/price/gasoline/{month}/{year}', GasStationController::class . ':checkActualPrice');
 
     $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function () use ($app) {
         $responseFactory = new ResponseFactory();
