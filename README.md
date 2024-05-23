@@ -2,22 +2,32 @@
 
 ## Visão Geral
 
-A **CheckPriceAPI** é uma solução dedicada a fornecer informações de preços para diversos produtos na cidade de Joinville (futuramente outras cidades). O objetivo é facilitar o acesso a dados atualizados de preços para consumidores e empresas, permitindo uma tomada de decisão mais informada.
+A **CheckPriceAPI** é uma solução dedicada a fornecer informações de preços para diversos produtos na cidade de Joinville (e potencialmente em outras cidades no futuro). O objetivo é facilitar o acesso a dados atualizados de preços para consumidores e empresas, permitindo uma tomada de decisão mais informada.
 
 ## Produtos Monitorados
 
 Atualmente, a API cobre os seguintes produtos:
 
 - **Gasolina** (Todos os tipos)
-- **Cesta Básica** (futuro)
-- **Peixes** (futuro)
-- **Churrasco** (futuro)
-- **Gás de Cozinha** (futuro)
-- **Mercado** (futuro)
+- **Cesta Básica** (atualizações planejadas)
+- **Peixes** (atualizações planejadas)
+- **Churrasco** (atualizações planejadas)
+- **Gás de Cozinha** (atualizações planejadas)
+- **Mercado** (atualizações planejadas)
+
+## Atualizações Planejadas
+
+Estão planejadas as seguintes atualizações para a API:
+
+- **Cesta Básica**: Será adicionada a funcionalidade de monitoramento de preços da cesta básica, proporcionando informações importantes sobre itens essenciais.
+- **Peixes**: Está prevista a inclusão do monitoramento de preços de diferentes tipos de peixes, oferecendo mais opções de produtos monitorados.
+- **Churrasco**: Será adicionado o monitoramento de preços de itens relacionados a churrasco, atendendo a uma demanda comum entre consumidores.
+- **Gás de Cozinha**: Está planejada a adição de preços de gás de cozinha à API, fornecendo informações cruciais para consumidores domésticos.
+- **Mercado**: Serão adicionados preços de diversos produtos de mercado, ampliando a variedade de produtos monitorados.
 
 ## Status do Projeto
 
-Este projeto está em desenvolvimento contínuo e será integrado a um aplicativo móvel futuramente. Estou focado em garantir a precisão e a atualidade dos dados fornecidos, além de expandir as funcionalidades e a cobertura de produtos.
+Este projeto está em desenvolvimento contínuo e será integrado a um aplicativo móvel no futuro. Estou focado em garantir a precisão e a atualidade dos dados fornecidos, além de expandir as funcionalidades e a cobertura de produtos.
 
 ## Funcionalidades Planejadas
 
@@ -28,7 +38,7 @@ Este projeto está em desenvolvimento contínuo e será integrado a um aplicativ
 
 ## Estrutura da API
 
-A estrutura básica da API é organizada em endpoints que permitem o acesso e a manipulação dos dados de preços. A seguir, um exemplo de como será a estrutura de endpoints:
+A estrutura básica da API é organizada em endpoints que permitem o acesso e a manipulação dos dados de preços. Abaixo está um exemplo de como será a estrutura de endpoints:
 
 ### Endpoints
 
@@ -72,7 +82,7 @@ A CheckPriceAPI será integrada a um aplicativo móvel, proporcionando uma exper
 
 ## Contribuição
 
-Este projeto não está aberto publicamente a contribuições. Se você estiver interessado em colaborar, por favor, entre em contato
+Este projeto não está aberto publicamente a contribuições. Se você estiver interessado em colaborar, por favor, entre em contato.
 
 ## Contato
 

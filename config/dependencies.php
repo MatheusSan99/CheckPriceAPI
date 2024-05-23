@@ -27,8 +27,7 @@ return function (ContainerBuilder $containerBuilder) {
         PDO::class => function (ContainerInterface $c) {
             $dbSettings = $c->get('settings')['db'];
     
-            $driver = $dbSettings['driver'];
-            $dsn = 'sqlite:' . $dbSettings['database']; // Caminho para o arquivo SQLite
+            $dsn = 'sqlite:' . $dbSettings['database'];
             
             try {
                 $pdo = new PDO($dsn);

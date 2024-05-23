@@ -2,9 +2,9 @@
 
 namespace API\CheckPrice\Controller;
 
+use API\CheckPrice\Domain\Entity\GasStation\UseCase\GasStationPdfHandler;
 use API\CheckPrice\Services\ConnectionHandler;
 use API\CheckPrice\Services\ParamsValidation\ParamsValidation;
-use API\CheckPrice\Services\GasStationPdfHandler;
 use API\CheckPrice\Services\PdfHandler\PdfHandler;
 use API\CheckPrice\Services\PdfHandler\PdfHandlerInterface;
 use Psr\Http\Message\ServerRequestInterface;

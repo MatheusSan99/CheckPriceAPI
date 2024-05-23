@@ -1,6 +1,6 @@
 <?php
 
-namespace API\CheckPrice\Services;
+namespace API\CheckPrice\Domain\Entity\GasStation\UseCase;
 
 use API\CheckPrice\Domain\Entity\Adress\AdressEntity;
 use API\CheckPrice\Domain\Entity\Gas\DieselEntity;
@@ -11,6 +11,7 @@ use API\CheckPrice\Domain\Entity\Gas\RegularGasEntity;
 use API\CheckPrice\Domain\Entity\GasStation\FlagEntity;
 use API\CheckPrice\Domain\Entity\GasStation\GasStationEntity;
 use API\CheckPrice\Domain\Entity\GasStation\UseCase\FlagCase;
+use API\CheckPrice\Services\AddressHandler;
 use Smalot\PdfParser\Document;
 
 trait GasStationPdfHandler
@@ -29,21 +30,22 @@ trait GasStationPdfHandler
     private function mapGasStation($arrGasStation)
     {
         $mappedGasStation = [];
+        $gasStation = [];
 
         $arrGasStation = $this->ignoreNonGasStationData($arrGasStation);
 
-        $gasStation = [];
+        if (empty($arrGasStation)) {
+            return [];
+        }
 
-        foreach ($arrGasStation as $key => $value) {
-            if (is_numeric($value)) {
-                if (!empty($gasStation)) {
-                    $mappedGasStation[] = $this->mapGasStationData($gasStation);
-                    $gasStation = [];
-                }
+        foreach ($arrGasStation as $gasStationData) {
+            if (is_numeric($gasStationData) && !empty($gasStation)) {
+                $mappedGasStation[] = $this->mapGasStationData($gasStation);
             }
 
-            $gasStation[] = $value;
+            $gasStation[] = $gasStationData;
         }
+
         return $mappedGasStation;
     }
 
