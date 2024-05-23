@@ -2,7 +2,7 @@
 
 namespace API\CheckPrice\Services;
 
-use Exception;
+use API\CheckPrice\Domain\Entity\GasStation\UseCase\GasStationPdfHandler;
 
 trait ConnectionHandler
 {
