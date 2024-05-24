@@ -6,9 +6,9 @@ RUN apt-get update && apt-get install -y \
 
 RUN docker-php-ext-install pdo pdo_sqlite
 
-ADD docker/centos.conf/xdebug.ini "$PHP_INI_DIR/conf.d/xdebug.ini"
+# ADD docker/centos.conf/xdebug.ini "$PHP_INI_DIR/conf.d/xdebug.ini"
 
-RUN pecl install xdebug
+# RUN pecl install xdebug
 
 ADD docker/php.ini-development "$PHP_INI_DIR/php.ini"
 ADD docker/apache2.conf "$APACHE_CONFDIR/conf-enabled/apache2.conf"
