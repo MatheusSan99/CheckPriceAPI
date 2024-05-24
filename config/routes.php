@@ -13,7 +13,7 @@ return function (App $app) {
         return $response;
     });
 
-    $app->get('/testes', function (ServerRequestInterface $request, ResponseInterface $response) {
+    $app->get('/checkprice', function (ServerRequestInterface $request, ResponseInterface $response) {
         $response = $response->withHeader('Content-Type', 'text/html');
         $response->getBody()->write("API INT233EGRAÇÂO");
         return $response;
