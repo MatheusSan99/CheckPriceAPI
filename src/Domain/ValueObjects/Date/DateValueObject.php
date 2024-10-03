@@ -12,7 +12,7 @@ class DateValueObject
     private $numericMonth;
     private $year;
 
-    public function __construct(int $month = null, int $year = null)
+    public function __construct(int $month, int $year)
     {
         $this->DateTime = new DateTime('now', new DateTimeZone('America/Sao_Paulo'));
 

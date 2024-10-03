@@ -23,5 +23,6 @@ final class YearValidation
 
             throw new \Exception('Year is too old, allowed year is: ' . implode(', ', $allowedYears) , 400);
         }
+        return $year;
     }
 }
