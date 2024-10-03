@@ -2,18 +2,13 @@
 
 namespace API\CheckPrice\Domain\UseCases;
 
-use API\CheckPrice\Application\ParamsValidation\ParamsValidation;
-use API\CheckPrice\Domain\ValueObjects\DateValueObject;
+use API\CheckPrice\Domain\ValueObjects\Date\DateValueObject;
 
 class SearchPriceCase
 {
     
     public function execute($type, $month, $year) 
     {
-        $ParamsValidation = new ParamsValidation();
-        $ParamsValidation->validateMonth($month);
-        $ParamsValidation->validateYear($year);
-
         return $this->defineUrlByType($type, new DateValueObject($month, $year));
     }
 

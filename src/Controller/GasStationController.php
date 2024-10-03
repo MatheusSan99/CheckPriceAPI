@@ -2,6 +2,8 @@
 
 namespace API\CheckPrice\Controller;
 
+use API\CheckPrice\Application\ParamsValidation\DateValidation\MonthValidation;
+use API\CheckPrice\Application\ParamsValidation\DateValidation\YearValidation;
 use API\CheckPrice\Domain\Service\FlagValidatorService;
 use API\CheckPrice\Domain\Services\AddressService;
 use API\CheckPrice\Domain\UseCases\FindGasStationListFromDocumentCase;
@@ -18,7 +20,7 @@ class GasStationController
     {
         try {
             $SearchPriceCase = new SearchPriceCase();
-            $pricesUrl = $SearchPriceCase->execute('combustiveis', $args['month'], $args['year']);
+            $pricesUrl = $SearchPriceCase->execute('combustiveis', MonthValidation::validate($args['month']), YearValidation::validate($args['year']));
             $SearchPdfDataCase = new SearchPdfDataCase();
             $pdfInText = $SearchPdfDataCase->execute($pricesUrl);
 
