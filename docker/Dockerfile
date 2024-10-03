@@ -1,15 +1,24 @@
 FROM php:8.2-apache
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && \
+    apt-get install -y \
+    libzip-dev \
     libsqlite3-dev \
-    && rm -rf /var/lib/apt/lists/*
+    zip \
+    poppler-utils
 
-RUN docker-php-ext-install pdo pdo_sqlite
+RUN docker-php-ext-install \
+    pdo \
+    pdo_sqlite \
+    zip
 
-# ADD docker/centos.conf/xdebug.ini "$PHP_INI_DIR/conf.d/xdebug.ini"
+ RUN pecl install xdebug
 
-# RUN pecl install xdebug
+RUN docker-php-ext-enable \
+    pdo \
+    pdo_sqlite
 
+ADD docker/centos.conf/xdebug.ini "$PHP_INI_DIR/conf.d/xdebug.ini"
 ADD docker/php.ini-development "$PHP_INI_DIR/php.ini"
 ADD docker/apache2.conf "$APACHE_CONFDIR/conf-enabled/apache2.conf"
 

@@ -214,27 +214,108 @@ class PDFObject
             return '';
         }
 
-        // Outside of (String) content in PDF document streams, all
-        // text should conform to UTF-8. Test for binary content by
-        // deleting everything after the first open-parenthesis ( which
-        // indicates the beginning of a string. Then test what remains
-        // for valid UTF-8. If it's not UTF-8, return an empty string
-        // as this $content is most likely binary.
-        if (false === mb_check_encoding(preg_replace('/\(.*$/s', '', $content), 'UTF-8')) {
+        // Outside of (String) and inline image content in PDF document
+        // streams, all text should conform to UTF-8. Test for binary
+        // content by deleting everything after the first open-
+        // parenthesis ( which indicates the beginning of a string, or
+        // the first ID command which indicates the beginning of binary
+        // inline image content. Then test what remains for valid
+        // UTF-8. If it's not UTF-8, return an empty string as this
+        // $content is most likely binary. Unfortunately, using
+        // mb_check_encoding(..., 'UTF-8') is not strict enough, so the
+        // following regexp, adapted from the W3, is used. See:
+        // https://www.w3.org/International/questions/qa-forms-utf-8.en
+        // We use preg_replace() instead of preg_match() to avoid "JIT
+        // stack limit exhausted" errors on larger files.
+        $utf8Filter = preg_replace('/(
+            [\x09\x0A\x0D\x20-\x7E] |            # ASCII
+            [\xC2-\xDF][\x80-\xBF] |             # non-overlong 2-byte
+            \xE0[\xA0-\xBF][\x80-\xBF] |         # excluding overlongs
+            [\xE1-\xEC\xEE\xEF][\x80-\xBF]{2} |  # straight 3-byte
+            \xED[\x80-\x9F][\x80-\xBF] |         # excluding surrogates
+            \xF0[\x90-\xBF][\x80-\xBF]{2} |      # planes 1-3
+            [\xF1-\xF3][\x80-\xBF]{3} |          # planes 4-15
+            \xF4[\x80-\x8F][\x80-\xBF]{2}        # plane 16
+        )/xs', '', preg_replace('/(\(|ID\s).*$/s', '', $content));
+
+        if ('' !== $utf8Filter) {
             return '';
+        }
+
+        // Find all inline image content and replace them so they aren't
+        // affected by the next steps
+        $pdfInlineImages = [];
+        $offsetBI = 0;
+        while (preg_match('/\sBI\s(\/.+?)\sID\s(.+?)\sEI(?=\s|$)/s', $content, $text, \PREG_OFFSET_CAPTURE, $offsetBI)) {
+            // Attempt to detemine if this instance of the 'BI' command
+            // actually occured within a (string) using the following
+            // steps:
+
+            // Step 1: Remove any escaped slashes and parentheses from
+            // the alleged image characteristics data
+            $para = str_replace(['\\\\', '\\(', '\\)'], '', $text[1][0]);
+
+            // Step 2: Remove all correctly ordered and balanced
+            // parentheses from (strings)
+            do {
+                $paraTest = $para;
+                $para = preg_replace('/\(([^()]*)\)/', '$1', $paraTest);
+            } while ($para != $paraTest);
+
+            $paraOpen = strpos($para, '(');
+            $paraClose = strpos($para, ')');
+
+            // Check: If the remaining text contains a close parenthesis
+            // ')' AND it occurs before any open parenthesis, then we
+            // are almost certain to be inside a (string)
+            if (0 < $paraClose && (false === $paraOpen || $paraClose < $paraOpen)) {
+                // Bump the search offset forward and match again
+                $offsetBI = (int) $text[1][1];
+                continue;
+            }
+
+            // Step 3: Double check that this is actually inline image
+            // data by parsing the alleged image characteristics as a
+            // dictionary
+            $dict = $this->parseDictionary('<<'.$text[1][0].'>>');
+
+            // Check if an image Width and Height are set in the dict
+            if ((isset($dict['W']) || isset($dict['Width']))
+                && (isset($dict['H']) || isset($dict['Height']))) {
+                $id = uniqid('IMAGE_', true);
+                $pdfInlineImages[$id] = [
+                    preg_replace(['/\r\n/', '/\r/', '/\n/'], ' ', $text[1][0]),
+                    preg_replace(['/\r\n/', '/\r/', '/\n/'], '', $text[2][0]),
+                ];
+                $content = preg_replace(
+                    '/'.preg_quote($text[0][0], '/').'/',
+                    '^^^'.$id.'^^^',
+                    $content,
+                    1
+                );
+            } else {
+                // If there was no valid dictionary, or a height and width
+                // weren't specified, then we don't know what this is, so
+                // just leave it alone; bump the search offset forward and
+                // match again
+                $offsetBI = (int) $text[1][1];
+            }
         }
 
         // Find all strings () and replace them so they aren't affected
         // by the next steps
         $pdfstrings = [];
         $attempt = '(';
-        while (preg_match('/'.preg_quote($attempt, '/').'.*?(?<![^\\\\]\\\\)\)/s', $content, $text)) {
+        while (preg_match('/'.preg_quote($attempt, '/').'.*?\)/s', $content, $text)) {
+            // Remove all escaped slashes and parentheses from the target text
+            $para = str_replace(['\\\\', '\\(', '\\)'], '', $text[0]);
+
             // PDF strings can contain unescaped parentheses as long as
             // they're balanced, so check for balanced parentheses
-            $left = preg_match_all('/(?<![^\\\\]\\\\)\(/', $text[0]);
-            $right = preg_match_all('/(?<![^\\\\]\\\\)\)/', $text[0]);
+            $left = preg_match_all('/\(/', $para);
+            $right = preg_match_all('/\)/', $para);
 
-            if ($left == $right) {
+            if (')' == $para[-1] && $left == $right) {
                 // Replace the string with a unique placeholder
                 $id = uniqid('STRING_', true);
                 $pdfstrings[$id] = $text[0];
@@ -260,7 +341,7 @@ class PDFObject
         // Find all dictionary << >> commands and replace them so they
         // aren't affected by the next steps
         $dictstore = [];
-        while (preg_match('/(<<.*?>> *)(BDC|BMC|DP|MP)/', $content, $dicttext)) {
+        while (preg_match('/(<<.*?>> *)(BDC|BMC|DP|MP)/s', $content, $dicttext)) {
             $dictid = uniqid('DICT_', true);
             $dictstore[$dictid] = $dicttext[1];
             $content = preg_replace(
@@ -282,12 +363,12 @@ class PDFObject
         //       PDF 32000:2008 lists them as 'i' and 'ri' respectively. Both versions
         //       appear here in the list for completeness.
         $operators = [
-          'b*', 'b', 'BDC', 'BMC', 'B*', 'BI', 'BT', 'BX', 'B', 'cm', 'cs', 'c', 'CS',
-          'd0', 'd1', 'd', 'Do', 'DP', 'EMC', 'EI', 'ET', 'EX', 'f*', 'f', 'F', 'gs',
-          'g', 'G',  'h', 'i', 'ID', 'I', 'j', 'J', 'k', 'K', 'l', 'm', 'MP', 'M', 'n',
-          'q', 'Q', 're', 'rg', 'ri', 'rI', 'RG', 'scn', 'sc', 'sh', 's', 'SCN', 'SC',
-          'S', 'T*', 'Tc', 'Td', 'TD', 'Tf', 'TJ', 'Tj', 'TL', 'Tm', 'Tr', 'Ts', 'Tw',
-          'Tz', 'v', 'w', 'W*', 'W', 'y', '\'', '"',
+            'b*', 'b', 'BDC', 'BMC', 'B*', 'BI', 'BT', 'BX', 'B', 'cm', 'cs', 'c', 'CS',
+            'd0', 'd1', 'd', 'Do', 'DP', 'EMC', 'EI', 'ET', 'EX', 'f*', 'f', 'F', 'gs',
+            'g', 'G',  'h', 'i', 'ID', 'I', 'j', 'J', 'k', 'K', 'l', 'm', 'MP', 'M', 'n',
+            'q', 'Q', 're', 'rg', 'ri', 'rI', 'RG', 'scn', 'sc', 'sh', 's', 'SCN', 'SC',
+            'S', 'T*', 'Tc', 'Td', 'TD', 'Tf', 'TJ', 'Tj', 'TL', 'Tm', 'Tr', 'Ts', 'Tw',
+            'Tz', 'v', 'w', 'W*', 'W', 'y', '\'', '"',
         ];
         foreach ($operators as $operator) {
             $content = preg_replace(
@@ -317,6 +398,16 @@ class PDFObject
             );
 
             $content = str_replace('@@@'.$id.'@@@', $text, $content);
+        }
+
+        // Restore the original content of any inline images
+        $pdfInlineImages = array_reverse($pdfInlineImages, true);
+        foreach ($pdfInlineImages as $id => $image) {
+            $content = str_replace(
+                '^^^'.$id.'^^^',
+                "\r\nBI\r\n".$image[0]." ID\r\n".$image[1]." EI\r\n",
+                $content
+            );
         }
 
         $content = trim(preg_replace(['/(\r\n){2,}/', '/\r\n +/'], "\r\n", $content));

@@ -2,53 +2,35 @@
 
 namespace API\CheckPrice\Controller;
 
-use API\CheckPrice\Domain\Entity\GasStation\UseCase\GasStationPdfHandler;
-use API\CheckPrice\Services\ConnectionHandler;
-use API\CheckPrice\Services\ParamsValidation\ParamsValidation;
-use API\CheckPrice\Services\PdfHandler\PdfHandler;
-use API\CheckPrice\Services\PdfHandler\PdfHandlerInterface;
+use API\CheckPrice\Domain\Service\FlagValidatorService;
+use API\CheckPrice\Domain\Services\AddressService;
+use API\CheckPrice\Domain\UseCases\FindGasStationListFromDocumentCase;
+use API\CheckPrice\Domain\UseCases\PdfHandler\SearchPdfDataCase;
+use API\CheckPrice\Domain\UseCases\SearchPriceCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Psr7\Response;
 
-class GasStationController implements PdfHandlerInterface
+class GasStationController
 {
     private $pdo;
-    use ConnectionHandler;
-    use ParamsValidation;
-    use GasStationPdfHandler;
-    use PdfHandler;
 
     public function checkActualPrice(ServerRequestInterface $request, Response $response, array $args): Response
     {
         try {
-            $this->validateMonth($args['month']);
-            $this->validateYear($args['year']);
-            
-            $pricesUrl = $this->searchPrices('combustiveis', $args['month'], $args['year']);
-            
-            if (empty($pricesUrl)) {
-                throw new \Exception('Tipo de pesquisa não encontrado', 404);
-            }
+            $SearchPriceCase = new SearchPriceCase();
+            $pricesUrl = $SearchPriceCase->execute('combustiveis', $args['month'], $args['year']);
+            $SearchPdfDataCase = new SearchPdfDataCase();
+            $pdfInText = $SearchPdfDataCase->execute($pricesUrl);
 
-            $gastStationList = $this->pdfReader($pricesUrl);
+            $FindGasStationListFromDocumentCase = new FindGasStationListFromDocumentCase(new FlagValidatorService(), new AddressService());
 
-            $response->getBody()->write(json_encode($gastStationList));
+            $pdfInText = $FindGasStationListFromDocumentCase->execute($pdfInText);
 
+            $response->getBody()->write(json_encode($pdfInText));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
         } catch (\Exception $e) {
             $response->getBody()->write(json_encode(['Erro' => $e->getMessage()]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus($e->getCode());
         }
     }
-
-    public function pdfReader(string $pricesUrl) : array
-    {
-        $document = $this->searchDataPDF($pricesUrl);
-
-        $gastStationList = $this->getGasStationListFromDocument($document);
-
-        return $gastStationList;
-    }
-
-    
 }

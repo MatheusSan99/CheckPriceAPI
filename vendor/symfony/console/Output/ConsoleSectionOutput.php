@@ -61,9 +61,9 @@ class ConsoleSectionOutput extends StreamOutput
      *
      * @param int $lines Number of lines to clear. If null, then the entire output of this section is cleared
      */
-    public function clear(int $lines = null): void
+    public function clear(?int $lines = null): void
     {
-        if (empty($this->content) || !$this->isDecorated()) {
+        if (!$this->content || !$this->isDecorated()) {
             return;
         }
 
