@@ -2,8 +2,8 @@
 
 namespace API\CheckPrice\Infra\Government;
 
-use API\CheckPrice\Domain\Services\Government\GovernmentAPIInterface;
-use API\CheckPrice\Domain\ValueObjects\Date\DateValueObject;
+use API\CheckPrice\Domain\Generic\ValueObjects\Date\DateValueObject;
+use API\CheckPrice\Domain\Government\Services\GovernmentAPIInterface;
 
 class JoinvilleGovernmentBaseAPI implements GovernmentAPIInterface
 {
@@ -16,7 +16,7 @@ class JoinvilleGovernmentBaseAPI implements GovernmentAPIInterface
 
     public function getBaseUrl() : string
     {
-        return 'https://www.joinville.sc.gov.br/wp-content/uploads/' . $this->DateValueObject->getYear() . '/0' . $this->DateValueObject->getNumericMonth() . '/';
+        return 'https://www.joinville.sc.gov.br/wp-content/uploads/' . $this->DateValueObject->getYear() . '/' . $this->DateValueObject->getNumericMonth(true) . '/';
     }
     
 }
