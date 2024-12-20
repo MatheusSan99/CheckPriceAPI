@@ -2,16 +2,23 @@
 
 namespace API\CheckPrice\Infra\Connection;
 
-class CurlConnection
+class CurlConnection implements ConnectionInterface
 {
-    public function getResponse(string $url): array
+    private array $headers = [];
+
+    public function getResponse(string $url, array $headers = []): array
     {
         $ch = curl_init($url);
     
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    
+        
+        if (!empty($headers)) {
+            $this->setHeaders($headers);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $this->headers);
+        }
+
         $response = curl_exec($ch);
         
         if ($response === false) {
@@ -34,6 +41,11 @@ class CurlConnection
         }
     
         return $decodedResponse;
+    }
+
+    public function setHeaders(array $headers): void
+    {
+        $this->headers = $headers;
     }
     
 }

@@ -1,17 +1,17 @@
 <?php
 
-namespace API\CheckPrice\Domain\Services\UseCases;
+namespace API\CheckPrice\Domain\GasStation\Services\UseCases;
 
-use API\CheckPrice\Domain\Services\FlagValidatorService;
-use API\CheckPrice\Domain\Services\AddressService;
-use API\CheckPrice\Domain\ValueObjects\Address\AddressValueObject;
-use API\CheckPrice\Domain\ValueObjects\Flag\FlagValueObject;
-use API\CheckPrice\Domain\ValueObjects\Gas\DieselValueObject;
-use API\CheckPrice\Domain\ValueObjects\Gas\EthanolValueObject;
-use API\CheckPrice\Domain\ValueObjects\Gas\GnvValueObject;
-use API\CheckPrice\Domain\ValueObjects\Gas\PremiumGasValueObject;
-use API\CheckPrice\Domain\ValueObjects\Gas\RegularGasValueObject;
-use API\CheckPrice\Domain\ValueObjects\GasStation\GasStationValueObject;
+use API\CheckPrice\Domain\GasStation\Services\FlagValidatorService;
+use API\CheckPrice\Domain\GasStation\ValueObjects\Flag\FlagValueObject;
+use API\CheckPrice\Domain\GasStation\ValueObjects\Gas\DieselValueObject;
+use API\CheckPrice\Domain\GasStation\ValueObjects\Gas\EthanolValueObject;
+use API\CheckPrice\Domain\GasStation\ValueObjects\Gas\GnvValueObject;
+use API\CheckPrice\Domain\GasStation\ValueObjects\Gas\PremiumGasValueObject;
+use API\CheckPrice\Domain\GasStation\ValueObjects\Gas\RegularGasValueObject;
+use API\CheckPrice\Domain\GasStation\ValueObjects\GasStation\GasStationValueObject;
+use API\CheckPrice\Domain\Generic\Services\AddressService;
+use API\CheckPrice\Domain\Generic\ValueObjects\Address\AddressValueObject;
 
 class FindGasStationListFromDocumentCase
 {
@@ -25,12 +25,46 @@ class FindGasStationListFromDocumentCase
     }
     public function execute(string $pdfInText) : string
     {
+        $test = $this->processText($pdfInText);
         $pdfInText = explode("\n", $pdfInText);
+
 
         $gasStationList = $this->mapGasStation($pdfInText);
 
         return json_encode($gasStationList);
     }
+
+    function processText($text)
+{
+    // Remove múltiplos espaços e quebras de linha
+    $text = preg_replace('/\s+/', ' ', $text);
+    $text = trim($text);
+
+    // Divide o texto em partes com base nas linhas (a partir de "POSTO / ENDEREÇO")
+    $lines = explode('POSTO / ENDEREÇO', $text);
+
+    $postos = [];
+
+    // Itera sobre as linhas, procurando extrair as informações dos postos
+    foreach ($lines as $line) {
+        // Aqui tentamos extrair dados como nome do posto e preços com expressão regular
+        preg_match('/([A-Za-z0-9\s]+)\s+(\d+[\.,]?\d*)\s+(\d+[\.,]?\d*)\s+(\d+[\.,]?\d*)\s+(\d+[\.,]?\d*)\s+(\d+[\.,]?\d*)/', $line, $matches);
+
+        if ($matches) {
+            // Adiciona o posto e seus preços ao array
+            $postos[] = [
+                'nome' => trim($matches[1]),
+                'preco_gasolina_comum' => $matches[2],
+                'preco_gasolina_aditivada' => $matches[3],
+                'preco_diesel' => $matches[4],
+                'preco_etanol' => $matches[5],
+                'preco_gnv' => $matches[6],
+            ];
+        }
+    }
+
+    return $postos;
+}
 
     private function mapGasStation($arrGasStation)
     {

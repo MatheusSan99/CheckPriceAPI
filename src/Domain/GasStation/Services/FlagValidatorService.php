@@ -1,6 +1,6 @@
 <?php
 
-namespace API\CheckPrice\Domain\Services;
+namespace API\CheckPrice\Domain\GasStation\Services;
 
 use Exception;
 
