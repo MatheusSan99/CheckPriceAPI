@@ -2,7 +2,7 @@ services:
   checkprice:
     build:
       context: .
-      dockerfile: docker/Dockerfile
+      dockerfile: Dockerfile
     environment:
       - DB_CONNECTION=sqlite
       - DB_DATABASE=/var/www/html/database/database.sqlite
@@ -13,4 +13,5 @@ services:
       - "8080:80"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-      
+    image: checkprice
+    command: php -S 0.0.0.0:80 -t /var/www/html/

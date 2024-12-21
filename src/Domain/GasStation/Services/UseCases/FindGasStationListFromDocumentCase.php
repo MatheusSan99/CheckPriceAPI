@@ -25,46 +25,10 @@ class FindGasStationListFromDocumentCase
     }
     public function execute(string $pdfInText) : string
     {
-        $test = $this->processText($pdfInText);
-        $pdfInText = explode("\n", $pdfInText);
-
-
         $gasStationList = $this->mapGasStation($pdfInText);
 
         return json_encode($gasStationList);
     }
-
-    function processText($text)
-{
-    // Remove múltiplos espaços e quebras de linha
-    $text = preg_replace('/\s+/', ' ', $text);
-    $text = trim($text);
-
-    // Divide o texto em partes com base nas linhas (a partir de "POSTO / ENDEREÇO")
-    $lines = explode('POSTO / ENDEREÇO', $text);
-
-    $postos = [];
-
-    // Itera sobre as linhas, procurando extrair as informações dos postos
-    foreach ($lines as $line) {
-        // Aqui tentamos extrair dados como nome do posto e preços com expressão regular
-        preg_match('/([A-Za-z0-9\s]+)\s+(\d+[\.,]?\d*)\s+(\d+[\.,]?\d*)\s+(\d+[\.,]?\d*)\s+(\d+[\.,]?\d*)\s+(\d+[\.,]?\d*)/', $line, $matches);
-
-        if ($matches) {
-            // Adiciona o posto e seus preços ao array
-            $postos[] = [
-                'nome' => trim($matches[1]),
-                'preco_gasolina_comum' => $matches[2],
-                'preco_gasolina_aditivada' => $matches[3],
-                'preco_diesel' => $matches[4],
-                'preco_etanol' => $matches[5],
-                'preco_gnv' => $matches[6],
-            ];
-        }
-    }
-
-    return $postos;
-}
 
     private function mapGasStation($arrGasStation)
     {
