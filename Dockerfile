@@ -32,10 +32,11 @@ RUN php -r '$res = iconv("utf-8", "utf-8//IGNORE", "fooą");'
 COPY . /var/www/html
 
 # Garantir permissões corretas
-RUN chown -R www-data:www-data /var/www/html && chmod -R 775 /var/www/html
+# RUN chown -R www-data:www-data /var/www/html && chmod -R 775 /var/www/html
 
 # Permissao scripts    
 RUN chmod +x /var/www/html/scripts/setup-php.sh
+RUN chmod +x /var/www/html/start.sh
 
 # Estágio para Python
 FROM python:$PYTHON_VERSION-alpine
@@ -62,5 +63,4 @@ EXPOSE 80
 # Definir o diretório de trabalho
 WORKDIR /var/www/html
 
-# Start
-CMD ["/start.sh"]
+CMD ["/var/www/html/start.sh"]
