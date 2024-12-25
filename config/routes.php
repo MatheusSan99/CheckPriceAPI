@@ -15,9 +15,16 @@ return function (App $app) {
 
     $app->get('/', function (ServerRequestInterface $request, ResponseInterface $response) {
         $response = $response->withHeader('Content-Type', 'text/html');
-        $response->getBody()->write("Bem vindo ao checkPrice");
+        
+        ob_start(); 
+        phpinfo(); 
+        $phpinfo = ob_get_clean(); 
+        
+        $response->getBody()->write($phpinfo);
+        
         return $response;
     });
+    
 
     $app->get('/v1/price/gasoline/{month}/{year}', GasStationController::class . ':checkActualPrice');
 

@@ -4,8 +4,9 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      - DB_CONNECTION=sqlite
-      - DB_DATABASE=/var/www/html/database/database.sqlite
+      - DB_CONNECTION=${DB_CONNECTION}
+      - DB_DATABASE=${DB_DATABASE}
+      - DEV_ENV=${DEV_ENV}
     container_name: checkprice
     volumes:
       - ./:/var/www/html/
@@ -14,4 +15,4 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     image: checkprice
-    command: php -S 0.0.0.0:80 -t /var/www/html/
+    command: /bin/bash -c "/var/www/html/scripts/setup-php.sh && php -S 0.0.0.0:80 -t /var/www/html/"

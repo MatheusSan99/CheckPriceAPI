@@ -13,13 +13,8 @@ zend.enable_gc = On
 zend.exception_ignore_args = On
 zend.exception_string_param_max_len = 0
 expose_php = On
-max_execution_time = 30
-max_input_time = 60
-memory_limit = 128M
 error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT
-display_errors = Off
 display_startup_errors = Off
-log_errors = On
 ignore_repeated_errors = Off
 ignore_repeated_source = Off
 report_memleaks = On
@@ -123,7 +118,6 @@ session.cookie_samesite =
 session.serialize_handler = php
 session.gc_probability = 1
 session.gc_divisor = 1000
-session.gc_maxlifetime = 1440
 session.referer_check =
 session.cache_limiter = nocache
 session.cache_expire = 180
@@ -166,3 +160,39 @@ ldap.max_links = -1
 [openssl]
 
 [ffi]
+
+; Exibição de erros
+display_errors = Off
+log_errors = On
+error_log = /var/log/php_errors.log
+
+; Limites de Execução
+max_execution_time = 30
+memory_limit = 128
+max_input_vars = 1000
+max_input_time = 60
+
+; Sessões
+session.gc_maxlifetime = 1440
+session.save_path = "/var/lib/php/sessions"
+session.cookie_secure = 1
+session.cookie_httponly = 1
+
+; Segurança
+expose_php = Off
+
+; Opcache
+opcache.enable = 1
+opcache.memory_consumption = 128
+opcache.interned_strings_buffer = 8
+opcache.max_accelerated_files = 4000
+opcache.revalidate_freq = 60
+opcache.fast_shutdown = 1
+
+; Upload de arquivos
+upload_max_filesize = 5M
+post_max_size = 8M
+
+; Cache de Arquivos
+session.cache_limiter = nocache
+session.cache_expire = 180
