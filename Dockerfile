@@ -36,6 +36,7 @@ RUN chown -R www-data:www-data /var/www/html && chmod -R 775 /var/www/html
 
 # Permissao scripts    
 RUN chmod +x /var/www/html/scripts/setup-php.sh
+RUN /var/www/html/scripts/setup-php.sh
 
 # Estágio para Python
 FROM python:$PYTHON_VERSION-alpine
