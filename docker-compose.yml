@@ -15,4 +15,4 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     image: checkprice
-    command: /bin/bash -c "/var/www/html/scripts/setup-php.sh && php -S 0.0.0.0:80 -t /var/www/html/"
+    # command: /bin/bash -c "/var/www/html/scripts/setup-php.sh && php -S 0.0.0.0:80 -t /var/www/html/"
