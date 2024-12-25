@@ -108,6 +108,18 @@ if ! php -m | grep -q pdo; then
     apk add --no-cache php83-pdo || { echo "Erro ao instalar o pdo"; exit 0; }
 fi
 
+#Instalar Nginx se nao tiver instalado
+if ! apk info --installed nginx >/dev/null 2>&1; then
+    echo "Instalando nginx..."
+    apk add --no-cache nginx || { echo "Erro ao instalar o nginx"; exit 0; }
+fi
+
+#Instalar phpfmp se nao tiver instalado
+if ! apk info --installed php83-fpm >/dev/null 2>&1; then
+    echo "Instalando php83-fpm..."
+    apk add --no-cache php83-fpm || { echo "Erro ao instalar o php83-fpm"; exit 0; }
+fi
+
 #Deletar Dependencias desnescessarias que sao utilizadas apenas na compilacao
 if apk info --installed gcc >/dev/null 2>&1; then
     apk del gcc make g++ linux-headers autoconf
