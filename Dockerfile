@@ -29,9 +29,6 @@ ENV LD_PRELOAD="/usr/lib/preloadable_libiconv.so php-fpm php"
 RUN php -r '$res = iconv("utf-8", "utf-8//IGNORE", "fooą");'
 
 # Copiar os arquivos do diretório atual para o container
-# Garante a permissao localmente nos scripts
-RUN chmod ./scripts/setup-php.sh
-RUN chmod ./start.sh
 COPY . /var/www/html
 
 # Garantir permissões corretas
