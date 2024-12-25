@@ -62,6 +62,3 @@ EXPOSE 80
 
 # Definir o diretório de trabalho
 WORKDIR /var/www/html
-
-# Comando para iniciar Nginx e PHP-FPM
-CMD ["sh", "-c", "php-fpm & nginx -g 'daemon off;'"]
