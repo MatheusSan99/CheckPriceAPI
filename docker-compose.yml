@@ -17,7 +17,6 @@ services:
       - pythonworker
     volumes:
       - ./:/var/www/html/ # Somente use em desenvolvimento, em produção REMOVA
-
   pythonworker:
     build:
       context: .

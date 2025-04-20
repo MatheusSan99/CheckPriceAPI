@@ -29,3 +29,5 @@ docker-compose up -d
 ```bash
 docker compose logs checkprice
 ```
+
+# Xdebug need the ip addr show eth0 or ip route 

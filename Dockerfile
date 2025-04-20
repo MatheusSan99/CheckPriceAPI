@@ -13,12 +13,13 @@ FROM php:8.3.1-fpm-alpine as final
 
 ARG DEV_ENV=false
 
-RUN apk add --no-cache nginx
+RUN apk add --no-cache nginx bash
 
 COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
-COPY . /var/www/html/
+COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 
-WORKDIR /var/www/html
+COPY . /var/www/html/
+WORKDIR /var/www/html/
 
 RUN if [ "$DEV_ENV" = "true" ]; then \
         cp /var/www/html/docker/php.ini-development /usr/local/etc/php/php.ini; \
