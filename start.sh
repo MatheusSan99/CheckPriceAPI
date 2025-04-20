@@ -1,10 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-set -e  # Para falhar em caso de erros
+# Inicia PHP-FPM
+php-fpm --daemonize
 
-#Esse script rodara o setup e iniciara o servidor
-
-# Rodar o script de setup
-/var/www/html/scripts/setup-php.sh
-
-php -S 0.0.0.0:80 -t /var/www/html/
+# Inicia Nginx em foreground
+nginx -g "daemon off;"

@@ -13,7 +13,11 @@ chmod +x start.sh
 - Build the image
 
 ```bash
-docker build compose build --no-cache
+docker compose build --build-arg DEV_ENV=true --no-cache 
+```
+- Build the image without dev dependencies
+```bash
+docker compose build --build-arg DEV_ENV=false --no-cache
 ```
 
 ## Run the image

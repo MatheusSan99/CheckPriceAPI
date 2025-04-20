@@ -87,8 +87,9 @@ if [ "$DEV_ENV" = "true" ]; then
         docker-php-ext-enable xdebug || { echo "Erro ao habilitar o Xdebug"; exit 0; }
         
         # Copiar as configurações para o arquivo de configuração do Xdebug
-        echo "Configurando Xdebug..."
-        echo "xdebug.mode=debug" > /var/www/html/docker/conf.d/docker-php-ext-xdebug.ini
+
+        echo "zend_extension=$(find /usr/local/lib/php/extensions/no-debug-non-zts-20230831/ -name 'xdebug.so')" > /var/www/html/docker/conf.d/docker-php-ext-xdebug.ini
+        echo "xdebug.mode=debug" >> /var/www/html/docker/conf.d/docker-php-ext-xdebug.ini
         echo "xdebug.start_with_request=yes" >> /var/www/html/docker/conf.d/docker-php-ext-xdebug.ini
         echo "xdebug.client_port=9003" >> /var/www/html/docker/conf.d/docker-php-ext-xdebug.ini
         echo "xdebug.client_host=172.17.0.1" >> /var/www/html/docker/conf.d/docker-php-ext-xdebug.ini

@@ -3,19 +3,20 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        DEV_ENV: ${DEV_ENV}
     container_name: checkprice
-    volumes:
-      - ./:/var/www/html/
     ports:
       - "8080:80"
     environment:
       - DB_CONNECTION=${DB_CONNECTION}
       - DB_DATABASE=${DB_DATABASE}
-      - DEV_ENV=${DEV_ENV}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
       - pythonworker
+    volumes:
+      - ./:/var/www/html/ # Somente use em desenvolvimento, em produção REMOVA
 
   pythonworker:
     build:
@@ -25,4 +26,4 @@ services:
     volumes:
       - ./:/app
     working_dir: /app
-    command: ["sleep", "infinity"] # só pra manter vivo
+    command: ["sleep", "infinity"]
