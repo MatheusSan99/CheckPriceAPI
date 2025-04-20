@@ -3,16 +3,26 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
-      - DB_CONNECTION=${DB_CONNECTION}
-      - DB_DATABASE=${DB_DATABASE}
-      - DEV_ENV=${DEV_ENV}
     container_name: checkprice
     volumes:
       - ./:/var/www/html/
     ports:
       - "8080:80"
+    environment:
+      - DB_CONNECTION=${DB_CONNECTION}
+      - DB_DATABASE=${DB_DATABASE}
+      - DEV_ENV=${DEV_ENV}
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    image: checkprice
-    # command: /bin/bash -c "/var/www/html/scripts/setup-php.sh && php -S 0.0.0.0:80 -t /var/www/html/"
+    depends_on:
+      - pythonworker
+
+  pythonworker:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    container_name: pythonworker
+    volumes:
+      - ./:/app
+    working_dir: /app
+    command: ["sleep", "infinity"] # só pra manter vivo

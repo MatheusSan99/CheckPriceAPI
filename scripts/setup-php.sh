@@ -7,13 +7,17 @@ CONTAINER_PHP_DIR="/var/www/html"
 SCRIPTS_DIR="/var/www/html/scripts"
 PHP_INI_DIR="/var/www/html/docker"
 
-#Instalar o PHP83 se nao tiver instalado
-if ! apk info --installed php83 >/dev/null 2>&1; then
-    echo "Instalando php83-dev e dependencias..."
-    apk add --no-cache php83-dev || { echo "Erro ao instalar o php83-dev"; exit 0; }
-    apk add --no-cache php83-xml || { echo "Erro ao instalar o php83 ou suas dependências"; exit 0; }
-    apk add --no-cache php83-openssl || { echo "Erro ao instalar o openssl"; exit 0; }
+if [ -d "vendor" ]; then
+  echo ">> Apagando dependências existentes em vendor/..."
+  rm -rf vendor/*
 fi
+
+# Instalar as dependências PHP
+echo ">> Instalando dependências PHP..."
+composer install --no-interaction --no-dev --optimize-autoloader
+echo ">> Dependências PHP instaladas com sucesso!"
+composer dump-autoload --optimize
+
 
 if [ "$DEV_ENV" = "true" ]; then
     echo "Ambiente de desenvolvimento detectado..."
@@ -81,9 +85,18 @@ if [ "$DEV_ENV" = "true" ]; then
     # Habilitar o Xdebug
     if command -v docker-php-ext-enable &>/dev/null; then
         docker-php-ext-enable xdebug || { echo "Erro ao habilitar o Xdebug"; exit 0; }
+        
+        # Copiar as configurações para o arquivo de configuração do Xdebug
+        echo "Configurando Xdebug..."
+        echo "xdebug.mode=debug" > /var/www/html/docker/conf.d/docker-php-ext-xdebug.ini
+        echo "xdebug.start_with_request=yes" >> /var/www/html/docker/conf.d/docker-php-ext-xdebug.ini
+        echo "xdebug.client_port=9003" >> /var/www/html/docker/conf.d/docker-php-ext-xdebug.ini
+        echo "xdebug.client_host=172.17.0.1" >> /var/www/html/docker/conf.d/docker-php-ext-xdebug.ini
+        echo "xdebug.log=/tmp/xdebug_remote.log" >> /var/www/html/docker/conf.d/docker-php-ext-xdebug.ini
     else
         echo "Aviso: docker-php-ext-enable não encontrado. Verifique a configuração manual do Xdebug."
     fi
+
 
     # Remover o arquivo go-pear.phar, se existir
     if [ -f go-pear.phar ]; then
