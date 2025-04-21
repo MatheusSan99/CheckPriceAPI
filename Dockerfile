@@ -13,7 +13,7 @@ FROM php:8.3.1-fpm-alpine as final
 
 ARG DEV_ENV=false
 
-RUN apk add --no-cache nginx bash
+RUN apk add --no-cache nginx bash sqlite
 
 COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
 COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
@@ -27,7 +27,8 @@ RUN if [ "$DEV_ENV" = "true" ]; then \
         cp /var/www/html/docker/php.ini-production /usr/local/etc/php/php.ini; \
     fi
 
-COPY ./nginx/default.conf /etc/nginx/http.d/default.conf
+COPY ./nginx/http.d/default.conf /etc/nginx/http.d/default.conf
+COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 
 COPY start.sh /start.sh
 RUN chmod +x /start.sh

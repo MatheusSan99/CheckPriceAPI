@@ -8,12 +8,12 @@ class AddressValueObject implements JsonSerializable
 {
     private string $street;
     private string $number;
-    private string $neighborhood;
+    private ?string $neighborhood;
     private string $city;
     private string $state;
     private ?string $zipCode;
 
-    public function __construct(string $street, string $number = null, string $neighborhood = null, string $city = null, string $state = null, ?string $zipCode = null)
+    public function __construct(string $street, string $number, ?string $neighborhood, string $city, string $state, string $zipCode)
     {
         $this->street = $street;
         $this->number = $number;
@@ -33,7 +33,7 @@ class AddressValueObject implements JsonSerializable
         return $this->number;
     }
 
-    public function getNeighborhood(): string
+    public function getNeighborhood(): ?string
     {
         return $this->neighborhood;
     }

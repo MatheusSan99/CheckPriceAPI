@@ -16,13 +16,14 @@ services:
     depends_on:
       - pythonworker
     volumes:
-      - ./:/var/www/html/ # Somente use em desenvolvimento, em produção REMOVA
+      - ./:/var/www/html/
+    working_dir: /var/www/html/
   pythonworker:
     build:
       context: .
       dockerfile: Dockerfile.python
     container_name: pythonworker
     volumes:
-      - ./:/app
-    working_dir: /app
+      - ./:/var/www/html/
+    working_dir: /var/www/html/
     command: ["sleep", "infinity"]

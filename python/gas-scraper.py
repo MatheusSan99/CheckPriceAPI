@@ -38,7 +38,7 @@ def parse_excel(url):
         raise ValueError("Cabeçalho não encontrado no arquivo Excel.")
 
     file.seek(0)
-    df = pd.read_excel(file, header=header_row)
+    df = pd.read_excel(file, header=header_row, dtype=str)
 
     # quantidade de linhas 
     print(f"Total de linhas: {len(df)}")
@@ -47,28 +47,6 @@ def parse_excel(url):
 def setup_database(db_path):
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS combustiveis (
-            CNPJ TEXT,
-            RAZAO TEXT,
-            FANTASIA TEXT,
-            ENDERECO TEXT,
-            NUMERO TEXT,
-            COMPLEMENTO TEXT,
-            BAIRRO TEXT,
-            CEP TEXT,
-            MUNICIPIO TEXT,
-            ESTADO TEXT,
-            BANDEIRA TEXT,
-            PRODUTO TEXT,
-            UNIDADE_MEDIDA TEXT,
-            PRECO_REVENDA REAL,
-            DATA_COLETA TEXT,
-            PRIMARY KEY (CNPJ, PRODUTO, DATA_COLETA)
-        )
-    ''')
-    conn.commit()
     return conn
 
 def save_or_update(df, conn):
@@ -93,7 +71,7 @@ def save_or_update(df, conn):
                 UNIDADE_MEDIDA=excluded.UNIDADE_MEDIDA,
                 PRECO_REVENDA=excluded.PRECO_REVENDA
         ''', (
-            str(row['CNPJ']),
+            str(row['CNPJ']).zfill(14),
             row['RAZÃO'],
             row['FANTASIA'],
             row['ENDEREÇO'],
@@ -122,7 +100,7 @@ if __name__ == '__main__':
     links.sort(key=extract_date_from_url, reverse=True)
     most_recent_urls = links[:2]
 
-    db_path = 'database/gas.db'
+    db_path = './../database/database.db'
     conn = setup_database(db_path)
 
     for url in most_recent_urls:

@@ -4,7 +4,6 @@ namespace API\CheckPrice\Infra\Government;
 
 use API\CheckPrice\Domain\Government\Services\GovernmentAPIInterface;
 use API\CheckPrice\Infra\Exceptions\UrlException;
-
 class BrasilGovernmentGasBaseAPI implements GovernmentAPIInterface
 {
     public function getBaseUrl(): string
@@ -17,7 +16,6 @@ class BrasilGovernmentGasBaseAPI implements GovernmentAPIInterface
         $command = escapeshellcmd("docker exec pythonworker python3 /app/python/gas-scraper.py $pageUrl");
         $output = shell_exec($command);
     
-        // Decodifica a saída JSON
         $result = json_decode($output, true);
     
         if (!isset($result['url']) || empty($result['url'])) {

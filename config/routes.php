@@ -27,6 +27,7 @@ return function (App $app) {
     
 
     $app->get('/v1/price/gasoline', GasStationController::class . ':checkActualPrice');
+    $app->get('/v1/price/gasoline/zipcode/{zipCode}', GasStationController::class . ':checkActualPriceByZipCode');
 
     $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function () use ($app) {
         $responseFactory = new ResponseFactory();
