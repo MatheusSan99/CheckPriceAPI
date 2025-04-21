@@ -26,7 +26,7 @@ return function (App $app) {
     });
     
 
-    $app->get('/v1/price/gasoline/{month}/{year}', GasStationController::class . ':checkActualPrice');
+    $app->get('/v1/price/gasoline', GasStationController::class . ':checkActualPrice');
 
     $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function () use ($app) {
         $responseFactory = new ResponseFactory();
