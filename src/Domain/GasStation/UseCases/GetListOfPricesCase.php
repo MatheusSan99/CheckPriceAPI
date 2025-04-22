@@ -13,8 +13,8 @@ class GetListOfPricesCase
         $this->repository = $repository;
     }
 
-    public function execute(): array
+    public function execute($limit, $offset): array
     {
-        return $this->repository->getAll();
+        return $this->repository->getAll($limit, $offset);
     }
 }

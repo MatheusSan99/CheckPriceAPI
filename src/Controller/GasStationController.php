@@ -24,13 +24,14 @@ class GasStationController
     {
         try {
             $this->logger->info('Check actual price request received.');
-
-            $cachedResults = $this->getListOfPricesCase->execute();
+            $limit = $request->getQueryParams()['limit'] ?? 100;
+            $offset = $request->getQueryParams()['offset'] ?? 1;
+            $cachedResults = $this->getListOfPricesCase->execute($limit, $offset);
 
             if (empty($cachedResults)) {
                 $SearchPriceCase = new SearchPriceCase(new BrasilGovernmentGasBaseAPI());
                 $SearchPriceCase->execute();
-                $cachedResults = $this->getListOfPricesCase->execute();
+                $cachedResults = $this->getListOfPricesCase->execute($limit, $offset);
             }
 
             if (empty($cachedResults)) {

@@ -16,13 +16,16 @@ class GasStationRepository implements GasStationRepositoryInterface
         $this->connection = $connection;
     }
 
-    public function getAll(): array
+    public function getAll(int $limit, int $offset): array
     {
-        $stmt = $this->connection->query('SELECT * FROM combustiveis');
+        $stmt = $this->connection->prepare('SELECT * FROM combustiveis LIMIT ? OFFSET ?');
+        $stmt->execute([$limit, $offset]);
+    
         $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
+    
         return array_map(fn($item) => $this->mapToEntity($item), $results);
     }
+    
 
     public function getByCNPJ(string $cnpj): ?GasStation
     {

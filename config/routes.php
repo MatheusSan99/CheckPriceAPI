@@ -25,7 +25,6 @@ return function (App $app) {
         return $response;
     });
     
-
     $app->get('/v1/price/gasoline', GasStationController::class . ':checkActualPrice');
     $app->get('/v1/price/gasoline/zipcode/{zipCode}', GasStationController::class . ':checkActualPriceByZipCode');
 

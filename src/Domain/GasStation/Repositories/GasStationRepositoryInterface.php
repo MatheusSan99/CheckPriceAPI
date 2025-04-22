@@ -6,7 +6,7 @@ use API\CheckPrice\Domain\GasStation\Entities\GasStation as GasStationEntity;
 
 interface GasStationRepositoryInterface
 {
-    public function getAll(): array;
+    public function getAll(int $limit, int $offset): array;
 
     public function getByCNPJ(string $cnpj): ?GasStationEntity;
 
