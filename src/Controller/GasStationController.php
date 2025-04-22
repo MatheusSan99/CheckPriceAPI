@@ -39,10 +39,14 @@ class GasStationController
 
             $this->logger->info('Prices retrieved successfully.');
 
-            $response->getBody()->write(json_encode($cachedResults));
+            $compressed = gzencode(json_encode($cachedResults));
 
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
-        } catch (\Exception $e) {
+            $response->getBody()->write($compressed);
+            
+            return $response
+                ->withHeader('Content-Type', 'application/json')
+                ->withHeader('Content-Encoding', 'gzip')
+                ->withStatus(200);        } catch (\Exception $e) {
             $response->getBody()->write(json_encode(['Erro' => $e->getMessage()]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus($e->getCode());
         }
