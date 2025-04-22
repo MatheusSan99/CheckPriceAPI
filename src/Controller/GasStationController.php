@@ -3,6 +3,7 @@
 namespace API\CheckPrice\Controller;
 
 use API\CheckPrice\Domain\DataSource\Services\UseCases\SearchPriceCase;
+use API\CheckPrice\Domain\GasStation\UseCases\GetListOfPricesByZipCodeCase;
 use API\CheckPrice\Infra\Government\BrasilGovernmentGasBaseAPI;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Psr7\Response;
@@ -13,11 +14,13 @@ class GasStationController
 {
     private LoggerInterface $logger;
     private GetListOfPricesCase $getListOfPricesCase;
+    private GetListOfPricesByZipCodeCase $GetListOfPricesByZipCodeCase;
 
-    public function __construct(GetListOfPricesCase $getListOfPricesCase,  LoggerInterface $logger)
+    public function __construct(GetListOfPricesCase $getListOfPricesCase, GetListOfPricesByZipCodeCase $getListOfPricesByZipCodeCase, LoggerInterface $logger)
     {
         $this->logger = $logger;
         $this->getListOfPricesCase = $getListOfPricesCase;
+        $this->GetListOfPricesByZipCodeCase = $getListOfPricesByZipCodeCase;
     }
 
     public function checkActualPrice(ServerRequestInterface $request, Response $response, array $args): Response
@@ -64,7 +67,7 @@ class GasStationController
                 throw new \Exception('Zip code is required', 400);
             }
 
-            $cachedResults = $this->getListOfPricesCase->execute($zipCode);
+            $cachedResults = $this->GetListOfPricesByZipCodeCase->execute($zipCode);
 
             if (empty($cachedResults)) {
                 throw new \Exception('No prices found for the provided zip code', 404);
